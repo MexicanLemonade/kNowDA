@@ -1,21 +1,15 @@
 import streamlit as st
-import base64
 
-def displayPDF(file):
-    # Opening file from file path
-    with open(file, "rb") as f:
-        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+def displayPDF(upload_file):
+    from pdf2image import convert_from_path
 
-    # Embedding PDF in HTML
-    pdf_display =  f"""<embed
-    class="pdfobject"
-    type="application/pdf"
-    title="Embedded PDF"
-    src="data:application/pdf;base64,{base64_pdf}"
-    style="overflow: auto; width: 100%; height: 100%;">"""
+    if uploaded_file is not None:
+        # Convert PDF to PIL image object
+        pages = convert_from_path(uploaded_file.name, 500)
+        image = pages[0]
 
-    # Displaying File
-    st.markdown(pdf_display, unsafe_allow_html=True)
+        # Display image in Streamlit
+        st.image(image, caption='PDF converted to image')
 
 def main():
     st.title('kNowDA: know your NDAs before you sign them')
