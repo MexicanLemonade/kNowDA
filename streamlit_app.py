@@ -35,7 +35,7 @@ def main():
 
             # To render the uploaded file 
             st.write("Preview of PDF file:")
-            displayPDF(uploaded_file.name)
+            displayPDF(uploaded_file)
 
             # To read file as bytes and then display it as a download link:
             with open(uploaded_file.name, "wb") as f:
