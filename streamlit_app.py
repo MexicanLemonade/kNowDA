@@ -1,4 +1,5 @@
 import streamlit as st
+import base64
 
 def displayPDF(file):
     # Opening file from file path
