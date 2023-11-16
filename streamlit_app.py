@@ -32,14 +32,6 @@ def main():
             st.write("filetype:", uploaded_file.type)
             st.write("filesize:", uploaded_file.size)
 
-            # To render the uploaded file 
-            st.write("Preview of PDF file:")
-            with open(uploaded_file.name, "rb") as f:
-                import base64
-                base64_pdf = base64.b64encode(f.read()).decode('utf-8')
-                pdf_display = f'<embed src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf">'
-                st.write(pdf_display, unsafe_allow_html=True)
-
             # To read file as bytes and then display it as a download link:
             with open(uploaded_file.name, "wb") as f:
                 f.write(uploaded_file.getbuffer())
