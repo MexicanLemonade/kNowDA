@@ -16,8 +16,8 @@ from typing import List
 os.environ['COHERE_API_KEY'] = "zlOymXPbRHyujsgkjerXJZXFVtq1aGHUOq96pXvQ"
 co = cohere.Client('zlOymXPbRHyujsgkjerXJZXFVtq1aGHUOq96pXvQ')
 
-def pdf_to_chunks(filename):
-    loader = PyPDFLoader(filename)
+def pdf_to_chunks(loader: PyPDFLoader):
+    # loader = PyPDFLoader(filename)
     pages = loader.load_and_split()
     chunked_pages = []
     for page in pages:
@@ -26,8 +26,8 @@ def pdf_to_chunks(filename):
             chunked_pages.append(Document(page_content=chunk, metadata=page.metadata))
     return chunked_pages
 
-def doc_generate(question, doc_name):
-    docs = [dict(chunk) for chunk in pdf_to_chunks(doc_name)]
+def doc_generate(question, pdf_loader):
+    docs = [dict(chunk) for chunk in pdf_to_chunks(pdf_loader)]
     # print(docs[0].keys())
     response = co.chat(
         chat_history=[
@@ -59,9 +59,12 @@ def sim_search(query: str, collection: List[str]):
     embedding = CohereEmbeddings()
     gen_sent_embedding = embedding.embed_query(query)
     chunk_embeddings = embedding.embed_documents([str(text) for text in collection])
-    similarities = np.dot(gen_sent_embedding, np.array(chunk_embeddings/np.linalg.norm(chunk_embeddings)).T)
+    similarities = np.dot(gen_sent_embedding/np.linalg.norm(gen_sent_embedding), np.array(chunk_embeddings/np.linalg.norm(chunk_embeddings)).T)
     max_idx = np.argmax(similarities)
-    return collection[max_idx]
+    if similarities[max_idx] > 0.8:
+        return collection[max_idx]
+    else:
+        return None
 
 if __name__ == '__main__':
     question = "Receiving Party shall destroy or return some Confidential Information upon the termination of Agreement."

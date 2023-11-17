@@ -4,10 +4,14 @@ import random
 import json
 import time
 from RAG import doc_generate, sim_search, spacy_chunking
+from tempfile import NamedTemporaryFile
+import langchain
 
-def generate_and_display(question, doc_name, original_text):
-    generation = doc_generate(question, doc_name)
-    st.sidebar.markdown(f"**Matched statement: {question}**")
+from langchain.document_loaders import PyPDFLoader
+
+def generate_and_display(question, pdf_loader, original_text):
+    generation = doc_generate(question, pdf_loader)
+    st.sidebar.markdown(f"**Full statement: {question}**")
     if generation.citations:
         cite_info = generation.citations[0]
         cite_start = cite_info['start']
@@ -19,9 +23,9 @@ def generate_and_display(question, doc_name, original_text):
                 referenced_doc = doc['snippet']
                 break
         if referenced_doc:
-            st.warning("Scroll to find exact reference in the document in highlighted text below.")
+            st.warning("Click on link to find references.")
             chunk = str(sim_search(generation.text[cite_start:cite_end], spacy_chunking(referenced_doc)))
-            st.sidebar.markdown(chunk, unsafe_allow_html=True)
+            # st.sidebar.markdown(chunk, unsafe_allow_html=True)
             st.write(highlight_term(original_text, chunk), unsafe_allow_html=True)
 
     else:
@@ -49,9 +53,6 @@ def load_sample_questions(num=3):
         descriptions = [questions[question_idx]['short_description'] for question_idx in selected_questions]
         full_questions = [questions[question_idx]['hypothesis'] for question_idx in selected_questions]
         return descriptions, full_questions
-        st.sidebar.write('Relevant Questions:')
-        for question_idx in selected_questions:
-            st.sidebar.checkbox(questions[question_idx]['short_description'], )
 
 def highlight_term(text, term):
     """Highlights the term within the text and add id for reference."""
@@ -72,15 +73,25 @@ def main():
     if uploaded_file is not None:
         # Check the file's extension
         if uploaded_file.name.endswith('.pdf'):
-
-            text = st.sidebar.text_area("Enter your question here:")
+            # Extract text from PDF file
+            pdf_reader = PyPDF2.PdfReader(uploaded_file)
+            with NamedTemporaryFile(delete=False) as f:
+                f.write(uploaded_file.getbuffer())
+                pdf_loader = PyPDFLoader(f.name)
+            pages = []
+            for page in range(len(pdf_reader.pages)):
+                pages.append(pdf_reader.pages[page].extract_text())
+            text = ' '.join(pages)
+            user_text = st.sidebar.text_area("Enter your question here:")
 
             if st.sidebar.button("Submit"):
-                # Do something with the text
-                # st.sidebar.write("You entered:", text)
-                matched_question = sim_search(text, full_questions)
+                matched_question = sim_search(user_text, full_questions)
                 # st.sidebar.write("Matched question:", matched_question)
-                generate_and_display(matched_question, uploaded_file.name, text)
+                if not matched_question:
+                    generate_and_display(user_text, pdf_loader, text)
+                else:
+                    st.sidebar.write("Matched statement:", matched_question)
+                    generate_and_display(matched_question, pdf_loader, text)
 
             # Display questions in Streamlit sidebar
             # Create checkboxes in the sidebar for each text example
@@ -88,14 +99,8 @@ def main():
             questions_dict = dict(zip(descriptions, questions))
             option = st.sidebar.radio("Or, some suggestions based on your document:", descriptions)
 
-            # Extract text from PDF file
-            pdf_reader = PyPDF2.PdfReader(uploaded_file)
-            text = ""
-            for page in range(len(pdf_reader.pages)):
-                text += pdf_reader.pages[page].extract_text()
-
             if option != "":
-                generate_and_display(questions_dict[option], uploaded_file.name, text)
+                generate_and_display(questions_dict[option], pdf_loader, text)
 
             # To read file as bytes and then display it as a download link:
             with open(uploaded_file.name, "wb") as f:
