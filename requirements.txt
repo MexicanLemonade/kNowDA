@@ -1,7 +1,7 @@
 aiohttp==3.8.6
 aiosignal==1.3.1
 altair==5.1.2
-altgraph @ file:///System/Volumes/Data/SWE/Apps/DT/BuildRoots/BuildRoot7/ActiveBuildRoot/Library/Caches/com.apple.xbs/Sources/python3/python3-133.100.1.1/altgraph-0.17.2-py2.py3-none-any.whl
+altgraph==0.17.2
 annotated-types==0.6.0
 anyio==3.7.1
 appnope==0.1.3
@@ -41,14 +41,14 @@ dill==0.3.7
 distro==1.8.0
 docx2txt==0.8
 ebcdic==1.1.1
-en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.0/en_core_web_sm-3.7.0-py3-none-any.whl
+en-core-web-sm==3.7.0
 exceptiongroup==1.1.3
 executing==1.2.0
 extract-msg==0.28.7
 fastavro==1.8.2
 fonttools==4.42.1
 frozenlist==1.4.0
-future @ file:///System/Volumes/Data/SWE/Apps/DT/BuildRoots/BuildRoot7/ActiveBuildRoot/Library/Caches/com.apple.xbs/Sources/python3/python3-133.100.1.1/future-0.18.2-py3-none-any.whl
+future==0.18.2
 gitdb==4.0.11
 GitPython==3.1.40
 grpcio==1.59.2
@@ -82,7 +82,7 @@ langcodes==3.3.0
 langsmith==0.0.64
 lazy-object-proxy==1.9.0
 lxml==4.9.3
-macholib @ file:///System/Volumes/Data/SWE/Apps/DT/BuildRoots/BuildRoot7/ActiveBuildRoot/Library/Caches/com.apple.xbs/Sources/python3/python3-133.100.1.1/macholib-1.15.2-py2.py3-none-any.whl
+macholib==1.15.2
 markdown-it-py==3.0.0
 MarkupSafe==2.1.3
 marshmallow==3.20.1
@@ -105,6 +105,7 @@ pdfminer.six==20191110
 pexpect==4.8.0
 pickleshare==0.7.5
 Pillow==10.0.1
+pip==21.2.4
 platformdirs==3.10.0
 pluggy==1.3.0
 portalocker==2.8.2
@@ -142,6 +143,7 @@ regex==2023.10.3
 requests==2.31.0
 rich==13.7.0
 rpds-py==0.12.0
+setuptools==58.0.4
 six==1.12.0
 smart-open==6.4.0
 smmap==5.0.1
@@ -169,8 +171,8 @@ tqdm==4.66.1
 traitlets==5.10.0
 typeguard==4.1.5
 typer==0.9.0
-typing-inspect==0.9.0
 typing_extensions==4.7.1
+typing-inspect==0.9.0
 tzdata==2023.3
 tzlocal==5.2
 urllib3==1.26.18
@@ -179,6 +181,7 @@ wasabi==1.1.2
 wcwidth==0.2.6
 weasel==0.3.4
 weaviate-client==3.25.3
+wheel==0.37.0
 wrapt==1.15.0
 xlrd==1.2.0
 XlsxWriter==3.1.9
