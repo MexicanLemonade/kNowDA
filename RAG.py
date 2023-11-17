@@ -41,27 +41,26 @@ def doc_generate(question, pdf_loader):
     )
     return response
 
-def spacy_chunking(doc: str):
-    import spacy
+def nltk_chunking(doc: str):
+    import nltk
     # check if spacy model is installed
     try:
-        nlp = spacy.load('en_core_web_sm')
-    except:
-        os.system('python -m spacy download en_core_web_sm')
-        nlp = spacy.load('en_core_web_sm')
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        nltk.download('punkt')
 
-    chunks = nlp(doc)
+    chunks = nltk.tokenize.sent_tokenize(doc)
     # print(chunks.sents)
 
-    return list(chunks.sents)
+    return list(chunks)
 
-def sim_search(query: str, collection: List[str]):
+def sim_search(query: str, collection: List[str], threshold=0.8):
     embedding = CohereEmbeddings()
     gen_sent_embedding = embedding.embed_query(query)
     chunk_embeddings = embedding.embed_documents([str(text) for text in collection])
     similarities = np.dot(gen_sent_embedding/np.linalg.norm(gen_sent_embedding), np.array(chunk_embeddings/np.linalg.norm(chunk_embeddings)).T)
     max_idx = np.argmax(similarities)
-    if similarities[max_idx] > 0.8:
+    if similarities[max_idx] > threshold:
         return collection[max_idx]
     else:
         return None

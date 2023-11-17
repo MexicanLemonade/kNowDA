@@ -3,7 +3,7 @@ import PyPDF2
 import random
 import json
 import time
-from RAG import doc_generate, sim_search, spacy_chunking
+from RAG import doc_generate, sim_search, nltk_chunking
 from tempfile import NamedTemporaryFile
 import langchain
 
@@ -24,7 +24,7 @@ def generate_and_display(question, pdf_loader, original_text):
                 break
         if referenced_doc:
             st.warning("Click on link to find references.")
-            chunk = str(sim_search(generation.text[cite_start:cite_end], spacy_chunking(referenced_doc)))
+            chunk = str(sim_search(generation.text[cite_start:cite_end], nltk_chunking(referenced_doc), threshold=0))
             # st.sidebar.markdown(chunk, unsafe_allow_html=True)
             st.write(highlight_term(original_text, chunk), unsafe_allow_html=True)
 
@@ -66,6 +66,9 @@ def main():
     # Instructions for user
     st.write('We provide references to the relevant clauses in your NDA to address your concerns.')
 
+    # Provide a demo file
+    st.write('You can try with our demo file [here](https://github.com/MexicanLemonade/kNowDA/blob/main/01_Bosch-Automotive-Service-Solutions-Mutual-Non-Disclosure-Agreement-7-12-17.pdf)')
+             
     # File uploader allows user to add their own PDF
     uploaded_file = st.file_uploader('Upload your input PDF file', type=['pdf'])
 
@@ -97,10 +100,11 @@ def main():
             # Create checkboxes in the sidebar for each text example
             descriptions, questions = load_sample_questions()
             questions_dict = dict(zip(descriptions, questions))
-            option = st.sidebar.radio("Or, some suggestions based on your document:", descriptions)
+            option = st.sidebar.radio("Or, some suggestions based on your document:", [''] + descriptions)
 
             if option != "":
                 generate_and_display(questions_dict[option], pdf_loader, text)
+
 
             # To read file as bytes and then display it as a download link:
             with open(uploaded_file.name, "wb") as f:
