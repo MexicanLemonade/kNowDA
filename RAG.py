@@ -11,6 +11,7 @@ import os
 import re
 import textract
 import numpy as np
+from typing import List
 
 os.environ['COHERE_API_KEY'] = "zlOymXPbRHyujsgkjerXJZXFVtq1aGHUOq96pXvQ"
 co = cohere.Client('zlOymXPbRHyujsgkjerXJZXFVtq1aGHUOq96pXvQ')
@@ -40,32 +41,24 @@ def doc_generate(question, doc_name):
     )
     return response
 
-def sim_search(gen_sent, doc):
-    # splitter = NLTKTextSplitter()
-    # chunks = splitter.split_text(doc)
-    # print(len(chunks))
+def spacy_chunking(doc: str):
     import spacy
-    from spacy.lang.en import English
+    # from spacy.lang.en import English
 
     sentencizer = spacy.load('en_core_web_sm')
 
-
-    # text = 'My first birthday was great. My 2. was even better.'
-
     chunks = sentencizer(doc)
-    
+    # print(chunks.sents)
+
+    return list(chunks.sents)
+
+def sim_search(query: str, collection: List[str]):
     embedding = CohereEmbeddings()
-    gen_sent_embedding = embedding.embed_query(gen_sent)
-    max_similarity = 0
-    max_chunk = chunks[0]
-    for chunk in chunks.sents:
-        chunk_embedding = embedding.embed_documents([str(chunk)])[0]
-        # directly compare the embeddings
-        similarity = np.dot(gen_sent_embedding, chunk_embedding)/(np.linalg.norm(gen_sent_embedding)*np.linalg.norm(chunk_embedding))
-        if similarity > max_similarity:
-            max_similarity = similarity
-            max_chunk = chunk
-    return max_chunk
+    gen_sent_embedding = embedding.embed_query(query)
+    chunk_embeddings = embedding.embed_documents([str(text) for text in collection])
+    similarities = np.dot(gen_sent_embedding, np.array(chunk_embeddings/np.linalg.norm(chunk_embeddings)).T)
+    max_idx = np.argmax(similarities)
+    return collection[max_idx]
 
 if __name__ == '__main__':
     question = "Receiving Party shall destroy or return some Confidential Information upon the termination of Agreement."
