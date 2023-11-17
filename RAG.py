@@ -43,11 +43,14 @@ def doc_generate(question, doc_name):
 
 def spacy_chunking(doc: str):
     import spacy
-    # from spacy.lang.en import English
+    # check if spacy model is installed
+    try:
+        nlp = spacy.load('en_core_web_sm')
+    except:
+        os.system('python -m spacy download en_core_web_sm')
+        nlp = spacy.load('en_core_web_sm')
 
-    sentencizer = spacy.load('en_core_web_sm')
-
-    chunks = sentencizer(doc)
+    chunks = nlp(doc)
     # print(chunks.sents)
 
     return list(chunks.sents)
