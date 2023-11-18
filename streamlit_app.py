@@ -3,7 +3,7 @@ import PyPDF2
 import random
 import json
 import time
-from RAG import doc_generate, sim_search, nltk_chunking
+from RAG import doc_generate, sim_search, nltk_chunking, set_key
 from tempfile import NamedTemporaryFile
 import langchain
 
@@ -61,6 +61,8 @@ def highlight_term(text, term):
 
 def main():
     st.title('kNowDA: know your NDAs before you sign them')
+    api_key = st.text_area("Enter your Cohere API Key here:")
+    set_key(api_key)
     full_descriptions, full_questions = load_questions()
 
     # Instructions for user

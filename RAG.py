@@ -13,8 +13,9 @@ import textract
 import numpy as np
 from typing import List
 
-os.environ['COHERE_API_KEY'] = "zlOymXPbRHyujsgkjerXJZXFVtq1aGHUOq96pXvQ"
-co = cohere.Client('zlOymXPbRHyujsgkjerXJZXFVtq1aGHUOq96pXvQ')
+def set_key(key):
+    os.environ['COHERE_API_KEY'] = key
+    # co = cohere.Client(key)
 
 def pdf_to_chunks(loader: PyPDFLoader):
     # loader = PyPDFLoader(filename)
@@ -29,9 +30,13 @@ def pdf_to_chunks(loader: PyPDFLoader):
 def doc_generate(question, pdf_loader):
     docs = [dict(chunk) for chunk in pdf_to_chunks(pdf_loader)]
     # print(docs[0].keys())
+    co = cohere.Client(os.environ['COHERE_API_KEY'])
     response = co.chat(
         chat_history=[
-            {"role": "USER", "message": "Take a deep breath and think step by step: Tell me whether the given clause is satisfied within the contract document. If it is satisfied, please provide the evidence in the original contract. If not, please specify if it is not mentioned in the contract, or the contract contradicted the clause, in which case you should also provide the evidence."},
+            {"role": "USER", "message": "Take a deep breath and think step by step.\
+             Act as an experienced assistant who is helping people understanding the NDA.\
+             Given a user statement or question, cite the relevant clauses in the NDA\
+             and provide a short explanation."},
         ],
         message=question,
         #   connectors=[{"id": "web-search"}] # perform web search before answering the question
